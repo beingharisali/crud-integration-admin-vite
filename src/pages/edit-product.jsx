@@ -1,34 +1,41 @@
 import axios from "axios";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button, Form } from "react-bootstrap";
-import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
+import { useNavigate, useParams } from "react-router-dom";
 
-function CreateProduct() {
-  const [product, setProduct] = useState({
-    title: "",
-    desc: "",
-    price: "",
-    rating: "",
-    review: "",
-  });
+function EditProduct() {
+  const [productData, setProductData] = useState({});
+  const params = useParams();
   const navigate = useNavigate();
+  console.log(params.id);
+  async function fetchProduct() {
+    const product = await axios.get(`http://localhost:8000/${params.id}`);
+    console.log(product.data);
+    setProductData(product.data);
+  }
+  useEffect(() => {
+    fetchProduct();
+  }, []);
   function changeHandler(e) {
     const name = e.target.name;
     const value = e.target.value;
     console.log(name, value);
-    setProduct({ ...product, [name]: value });
+    setProductData({ ...productData, [name]: value });
   }
   async function submitHandler(e) {
     e.preventDefault();
-    const res = await axios.post("http://localhost:8000/", product);
+    const res = await axios.patch(
+      `http://localhost:8000/${params.id}`,
+      productData
+    );
     console.log(res);
-    toast.success("Product created successfully");
+    toast.success("Product updated successfully");
     navigate("/");
   }
   return (
     <div className="w-50 mx-auto my-4">
-      <h2>Create Product</h2>
+      <h2>Edit Product</h2>
       <Form onSubmit={submitHandler}>
         <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
           <Form.Label>Title</Form.Label>
@@ -36,7 +43,7 @@ function CreateProduct() {
             type="text"
             placeholder="Pants"
             name="title"
-            value={product.title}
+            value={productData.title}
             onChange={changeHandler}
           />
         </Form.Group>
@@ -46,7 +53,7 @@ function CreateProduct() {
             type="text"
             placeholder="Product info"
             name="desc"
-            value={product.desc}
+            value={productData.desc}
             onChange={changeHandler}
           />
         </Form.Group>
@@ -56,7 +63,7 @@ function CreateProduct() {
             type="number"
             placeholder="15"
             name="price"
-            value={product.price}
+            value={productData.price}
             onChange={changeHandler}
           />
         </Form.Group>
@@ -66,7 +73,7 @@ function CreateProduct() {
             type="number"
             placeholder="0-5"
             name="rating"
-            value={product.rating}
+            value={productData.rating}
             onChange={changeHandler}
           />
         </Form.Group>
@@ -76,16 +83,16 @@ function CreateProduct() {
             type="text"
             placeholder="Client's Review"
             name="review"
-            value={product.review}
+            value={productData.review}
             onChange={changeHandler}
           />
         </Form.Group>
         <Button type="submit" variant="success">
-          Create
+          Edit
         </Button>
       </Form>
     </div>
   );
 }
 
-export default CreateProduct;
+export default EditProduct;
