@@ -10,9 +10,7 @@ function EditProduct() {
   const navigate = useNavigate();
   console.log(params.id);
   async function fetchProduct() {
-    const product = await axios.get(
-      `https://admin-portal-integration-node.onrender.com/${params.id}`
-    );
+    const product = await axios.get(`http://localhost:8000/${params.id}`);
     console.log(product.data);
     setProductData(product.data);
   }
@@ -28,7 +26,7 @@ function EditProduct() {
   async function submitHandler(e) {
     e.preventDefault();
     const res = await axios.patch(
-      `https://admin-portal-integration-node.onrender.com/${params.id}`,
+      `http://localhost:8000/${params.id}`,
       productData
     );
     console.log(res);
